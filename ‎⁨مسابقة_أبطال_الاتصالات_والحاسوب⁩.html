@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مسابقة أبطال الاتصالات والحاسوب</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #071947;
+      --bg-mid: #0e3585;
+      --bg-light: #1a56c4;
+      --cyan-glow: #38bdf8;
+      --gold: #fbbf24;
+      --green-btn: #22c55e;
+      --green-dark: #15803d;
+      --pink: #ec4899;
+      --blue: #0ea5e9;
+      --green: #22c55e;
+      --orange: #f97316;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: radial-gradient(circle at 50% 35%, var(--bg-light) 0%, var(--bg-mid) 55%, var(--bg-dark) 100%);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+      padding: 16px;
+    }
+
+    /* Cyber Grid Floor */
+    .cyber-grid {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(56, 189, 248, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.14) 1px, transparent 1px);
+      background-size: 46px 46px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-horizon {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 35vh;
+      background: linear-gradient(to top, rgba(56, 189, 248, 0.28), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Floating Satellites */
+    .satellite {
+      position: fixed;
+      top: 18px;
+      width: 110px;
+      height: 110px;
+      z-index: 1;
+      opacity: 0.92;
+      animation: floatSat 4.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .satellite.left { left: 20px; }
+    .satellite.right { right: 20px; transform: scaleX(-1); animation-delay: 1.5s; }
+
+    @keyframes floatSat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(3deg); }
+    }
+    .satellite.right {
+      animation-name: floatSatRight;
+    }
+    @keyframes floatSatRight {
+      0%, 100% { transform: scaleX(-1) translateY(0px) rotate(0deg); }
+      50% { transform: scaleX(-1) translateY(-10px) rotate(3deg); }
+    }
+
+    /* Background Monitors */
+    .bg-monitor {
+      position: fixed;
+      bottom: 85px;
+      width: 170px;
+      opacity: 0.35;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .bg-monitor.left { left: 2%; }
+    .bg-monitor.right { right: 2%; transform: scaleX(-1); }
+
+    /* Main Container */
+    .game-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 960px;
+      background: rgba(10, 34, 92, 0.72);
+      border: 3px solid rgba(56, 189, 248, 0.45);
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 0 30px rgba(56, 189, 248, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 22px 26px 26px;
+      transition: all 0.3s ease;
+    }
+
+    /* Top Bar */
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .badge-score {
+      background: linear-gradient(180deg, #1e3a8a, #172554);
+      border: 2px solid #fbbf24;
+      border-radius: 50px;
+      padding: 6px 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fde68a;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .sound-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .sound-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      transform: scale(1.08);
+    }
+
+    /* Header Titles */
+    .slide-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .main-title {
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      font-weight: 900;
+      background: linear-gradient(180deg, #fde047 0%, #f97316 55%, #ef4444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 0 #1e1b4b) drop-shadow(0 0 12px rgba(253, 224, 71, 0.35));
+      line-height: 1.25;
+    }
+
+    .sub-title {
+      font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      margin-top: 4px;
+    }
+
+    /* Question Banner & Character Row */
+    .stage-top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 22px;
+      flex-direction: row-reverse;
+    }
+
+    .character-box {
+      flex-shrink: 0;
+      width: 125px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: bounceChar 3s ease-in-out infinite;
+    }
+
+    @keyframes bounceChar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .speech-bubble {
+      flex: 1;
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 22px;
+      padding: 16px 22px;
+      border: 4px solid #38bdf8;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      left: -18px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-width: 12px 18px 12px 0;
+      border-style: solid;
+      border-color: transparent #38bdf8 transparent transparent;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-width: 9px 14px 9px 0;
+      border-style: solid;
+      border-color: transparent #ffffff transparent transparent;
+    }
+
+    .question-text {
+      font-size: clamp(1.2rem, 2.7vw, 1.65rem);
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.4;
+    }
+
+    .speaker-tag {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #eff6ff;
+      border: 2px solid #93c5fd;
+      border-radius: 14px;
+      padding: 6px 12px;
+      flex-shrink: 0;
+    }
+
+    .speaker-tag span {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #1e3a8a;
+      margin-top: 2px;
+    }
+
+    /* Options Grid (Slides 1 & 2 - Image Cards) */
+    .options-grid-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .card-option {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 14px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      border: 5px solid var(--card-color, #38bdf8);
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.2s;
+    }
+
+    .card-option:hover:not(.disabled) {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 14px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-option:active:not(.disabled) {
+      transform: translateY(2px);
+    }
+
+    .card-num {
+      position: absolute;
+      top: -12px;
+      right: -10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--card-color);
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #fff;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+
+    .card-art {
+      width: 105px;
+      height: 105px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 6px 0;
+    }
+
+    .card-label {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+
+    .card-letter {
+      margin-top: 6px;
+      background: #0f172a;
+      color: #fff;
+      width: 38px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 900;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    /* Slide 3 Layout (Sign + Text Options) */
+    .slide3-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 22px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .sign-showcase {
+      background: #ffffff;
+      border: 6px solid #22c55e;
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .text-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .text-option {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 18px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      border: 4px solid var(--card-color);
+      box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+      transition: transform 0.18s ease, background 0.2s;
+    }
+
+    .text-option:hover:not(.disabled) {
+      transform: translateX(-6px);
+      background: #f8fafc;
+    }
+
+    .text-option-badge {
+      background: var(--card-color);
+      color: #fff;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+    }
+
+    .text-option-content {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    /* Correct & Wrong States */
+    .correct-choice {
+      background: #dcfce7 !important;
+      border-color: #16a34a !important;
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.85) !important;
+      animation: popCorrect 0.45s ease;
+    }
+
+    .wrong-choice {
+      background: #fee2e2 !important;
+      border-color: #dc2626 !important;
+      animation: shakeWrong 0.4s ease;
+      opacity: 0.78;
+    }
+
+    .disabled {
+      cursor: default;
+    }
+
+    @keyframes popCorrect {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shakeWrong {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-6px); }
+    }
+
+    /* Feedback Banner */
+    .feedback-box {
+      min-height: 54px;
+      border-radius: 16px;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.25s ease;
+    }
+
+    .feedback-box.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback-box.success {
+      background: rgba(22, 163, 74, 0.9);
+      border: 2px solid #86efac;
+      color: #fff;
+    }
+
+    .feedback-box.error {
+      background: rgba(220, 38, 38, 0.9);
+      border: 2px solid #fca5a5;
+      color: #fff;
+    }
+
+    /* Bottom Bar: Star Progress & Next Button */
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 6px;
+    }
+
+    .progress-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      position: relative;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .star-icon {
+      width: 46px;
+      height: 46px;
+      z-index: 2;
+      margin-left: -14px;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+      transition: transform 0.3s ease;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 22px;
+      background: #1e293b;
+      border: 3px solid #94a3b8;
+      border-radius: 50px;
+      overflow: hidden;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 33.3%;
+      background: linear-gradient(90deg, #f59e0b, #fde047);
+      border-radius: 50px;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .next-btn {
+      background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
+      color: #fff;
+      border: 3px solid #ffffff;
+      border-radius: 18px;
+      padding: 10px 28px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 0 #14532d, 0 10px 20px rgba(0,0,0,0.35);
+      transition: all 0.2s ease;
+    }
+
+    .next-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .next-btn:not(:disabled):hover {
+      transform: translateY(-3px);
+      filter: brightness(1.08);
+    }
+
+    .next-btn:not(:disabled):active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #14532d;
+    }
+
+    /* End Screen */
+    .end-screen {
+      text-align: center;
+      padding: 24px 12px;
+      display: none;
+    }
+
+    .end-screen.active {
+      display: block;
+      animation: popCorrect 0.5s ease;
+    }
+
+    .trophy-circle {
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 16px;
+      background: radial-gradient(circle, #fde047, #f59e0b);
+      border-radius: 50%;
+      border: 5px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.7);
+    }
+
+    .stars-earned {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 18px 0;
+      font-size: 2.8rem;
+    }
+
+    .restart-btn {
+      background: linear-gradient(180deg, #38bdf8, #0284c7);
+      color: #fff;
+      border: 3px solid #fff;
+      border-radius: 18px;
+      padding: 14px 36px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 12px;
+      box-shadow: 0 6px 0 #075985;
+      transition: transform 0.2s;
+    }
+
+    .restart-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Footer Credit */
+    .designer-footer {
+      text-align: center;
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(56, 189, 248, 0.25);
+      color: #fde68a;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    @media (max-width: 768px) {
+      .options-grid-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .slide3-layout {
+        grid-template-columns: 1fr;
+      }
+      .stage-top {
+        flex-direction: column;
+      }
+      .speech-bubble::before, .speech-bubble::after {
+        display: none;
+      }
+      .character-box {
+        width: 95px;
+      }
+      .satellite {
+        width: 70px;
+        height: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cyber-grid"></div>
+  <div class="glow-horizon"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Decorative Satellites -->
+  <svg class="satellite left" viewBox="0 0 120 120">
+    <g transform="rotate(-25 60 60)">
+      <rect x="8" y="45" width="34" height="30" rx="3" fill="#38bdf8" stroke="#e0f2fe" stroke-width="2"/>
+      <line x1="19" y1="45" x2="19" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="30" y1="45" x2="30" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="8" y1="60" x2="42" y2="60" stroke="#0369a1" stroke-width="2"/>
+      <rect x="78" y="45" width="34" height="30" rx="3" fill="#38bdf8" stroke="#e0f2fe" stroke-width="2"/>
+      <line x1="89" y1="45" x2="89" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="100" y1="45" x2="100" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="78" y1="60" x2="112" y2="60" stroke="#0369a1" stroke-width="2"/>
+      <rect x="42" y="57" width="36" height="6" fill="#94a3b8"/>
+      <rect x="48" y="42" width="24" height="36" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="2.5"/>
+      <circle cx="60" cy="60" r="6" fill="#fbbf24"/>
+      <path d="M52 82 Q60 94 68 82" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+      <path d="M46 89 Q60 105 74 89" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+  </svg>
+
+  <svg class="satellite right" viewBox="0 0 120 120">
+    <g transform="rotate(-25 60 60)">
+      <rect x="8" y="45" width="34" height="30" rx="3" fill="#38bdf8" stroke="#e0f2fe" stroke-width="2"/>
+      <line x1="19" y1="45" x2="19" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="30" y1="45" x2="30" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="8" y1="60" x2="42" y2="60" stroke="#0369a1" stroke-width="2"/>
+      <rect x="78" y="45" width="34" height="30" rx="3" fill="#38bdf8" stroke="#e0f2fe" stroke-width="2"/>
+      <line x1="89" y1="45" x2="89" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="100" y1="45" x2="100" y2="75" stroke="#0369a1" stroke-width="2"/>
+      <line x1="78" y1="60" x2="112" y2="60" stroke="#0369a1" stroke-width="2"/>
+      <rect x="42" y="57" width="36" height="6" fill="#94a3b8"/>
+      <rect x="48" y="42" width="24" height="36" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="2.5"/>
+      <circle cx="60" cy="60" r="6" fill="#fbbf24"/>
+      <path d="M52 82 Q60 94 68 82" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </svg>
+
+  <!-- Background Monitors -->
+  <svg class="bg-monitor left" viewBox="0 0 160 130">
+    <rect x="15" y="10" width="130" height="82" rx="10" fill="#0284c7" stroke="#7dd3fc" stroke-width="4"/>
+    <rect x="24" y="19" width="112" height="64" rx="5" fill="#38bdf8"/>
+    <rect x="65" y="92" width="30" height="18" fill="#64748b"/>
+    <rect x="45" y="110" width="70" height="10" rx="5" fill="#94a3b8"/>
+  </svg>
+
+  <svg class="bg-monitor right" viewBox="0 0 160 130">
+    <rect x="15" y="10" width="130" height="82" rx="10" fill="#0284c7" stroke="#7dd3fc" stroke-width="4"/>
+    <rect x="24" y="19" width="112" height="64" rx="5" fill="#38bdf8"/>
+    <rect x="65" y="92" width="30" height="18" fill="#64748b"/>
+    <rect x="45" y="110" width="70" height="10" rx="5" fill="#94a3b8"/>
+  </svg>
+
+  <!-- Main Game Card -->
+  <main class="game-wrapper">
+    <div class="top-controls">
+      <div class="badge-score">
+        <span>⭐ النقاط:</span>
+        <span id="score-display">0 / 6</span>
+      </div>
+      <div style="font-weight: 800; color: #bae6fd; font-size: 1.05rem;" id="stage-indicator">
+        المرحلة 1 من 6
+      </div>
+      <button class="sound-btn" id="sound-toggle" title="تشغيل/كتم الصوت">🔊</button>
+    </div>
+
+    <!-- Active Quiz Stage -->
+    <div id="quiz-stage">
+      <header class="slide-header">
+        <h1 class="main-title" id="slide-title">مسابقة أبطال الاتصالات</h1>
+        <p class="sub-title" id="slide-subtitle">أي صورة تمثل وسيلة اتصالات؟</p>
+      </header>
+
+      <div class="stage-top">
+        <!-- Main Student Character -->
+        <div class="character-box" id="character-container"></div>
+
+        <!-- Question Bubble -->
+        <div class="speech-bubble">
+          <div class="question-text" id="question-text">
+            أيُّ جِهازٍ يُساعِدُنا على التَّحَدُّثِ مع جَدِّنا؟
+          </div>
+          <!-- Speaker Tag (Without Noura on Slide 1!) -->
+          <div class="speaker-tag" id="speaker-tag"></div>
+        </div>
+      </div>
+
+      <!-- Dynamic Options Area -->
+      <div id="options-container"></div>
+
+      <!-- Feedback Message -->
+      <div class="feedback-box" id="feedback-box"></div>
+
+      <!-- Bottom Progress & Next -->
+      <div class="bottom-bar">
+        <div class="progress-container">
+          <svg class="star-icon" id="progress-star" viewBox="0 0 64 64">
+            <polygon points="32,4 40,22 60,24 45,38 49,58 32,48 15,58 19,38 4,24 24,22" fill="#fde047" stroke="#d97706" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+
+        <button class="next-btn" id="next-btn" disabled>
+          <span>التالي</span>
+          <span>⬅</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- End Screen -->
+    <div class="end-screen" id="end-screen">
+      <div class="trophy-circle">
+        <span style="font-size: 4.2rem;">🏆</span>
+      </div>
+      <h2 class="main-title" style="font-size: 2.3rem;">أحسنت يا بطل!</h2>
+      <p class="sub-title" id="final-message" style="margin-top: 10px; font-size: 1.3rem;">
+        لقد أكملت مسابقة أبطال الاتصالات والحاسوب بنجاح!
+      </p>
+      <div class="stars-earned" id="stars-earned">⭐⭐⭐</div>
+      <div style="font-size: 1.4rem; font-weight: 800; color: #fde047; margin-bottom: 14px;" id="final-score-text">
+        النتيجة النهائية: 3 من 3
+      </div>
+      <button class="restart-btn" id="restart-btn">العب مرة أخرى 🔄</button>
+    </div>
+
+    <!-- Designer Credit Bar -->
+    <footer class="designer-footer">
+      تصميم المعلمة بدرية حكمي
+    </footer>
+  </main>
+
+  <script>
+    // Sound Synthesizer (Web Audio API - No external audio files needed)
+    let soundEnabled = true;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freqs, durations, type = 'sine') {
+      if (!soundEnabled) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      let now = audioCtx.currentTime;
+      freqs.forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(f, now);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + durations[i]);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + durations[i]);
+        now += durations[i] * 0.85;
+      });
+    }
+
+    function playCorrectSound() {
+      playTone([523.25, 659.25, 783.99, 1046.5], [0.12, 0.12, 0.14, 0.3], 'triangle');
+    }
+
+    function playWrongSound() {
+      playTone([240, 180], [0.18, 0.28], 'sawtooth');
+    }
+
+    function playWinSound() {
+      playTone([523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5], [0.12, 0.12, 0.12, 0.22, 0.12, 0.4], 'triangle');
+    }
+
+    // Custom SVG Characters (All Boys!)
+    const boyCharacters = {
+      suitBoy: `
+        <svg viewBox="0 0 140 180" width="120" height="155">
+          <!-- Hair -->
+          <path d="M40 52 C35 22, 105 22, 100 52 C102 36, 85 28, 70 28 C55 28, 38 36, 40 52 Z" fill="#4a2c18"/>
+          <path d="M42 48 Q70 20 98 48 Q92 26 70 26 Q48 26 42 48" fill="#5c3820"/>
+          <!-- Face -->
+          <circle cx="70" cy="58" r="26" fill="#fcd3b4" stroke="#d99b72" stroke-width="2"/>
+          <!-- Ears -->
+          <circle cx="43" cy="58" r="5" fill="#fcd3b4"/>
+          <circle cx="97" cy="58" r="5" fill="#fcd3b4"/>
+          <!-- Eyes -->
+          <circle cx="61" cy="55" r="3.5" fill="#1e293b"/>
+          <circle cx="79" cy="55" r="3.5" fill="#1e293b"/>
+          <circle cx="62" cy="54" r="1.2" fill="#fff"/>
+          <circle cx="80" cy="54" r="1.2" fill="#fff"/>
+          <!-- Smile -->
+          <path d="M62 68 Q70 76 78 68" fill="none" stroke="#9a3412" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Suit Jacket -->
+          <path d="M44 90 L96 90 L104 148 L36 148 Z" fill="#64748b" stroke="#334155" stroke-width="2"/>
+          <!-- Shirt & Tie -->
+          <polygon points="62,90 78,90 70,115" fill="#ffffff"/>
+          <polygon points="68,94 72,94 74,118 70,124 66,118" fill="#0284c7"/>
+          <!-- Arms -->
+          <path d="M44 92 L24 115 L36 122 L48 105" fill="#64748b" stroke="#334155" stroke-width="2"/>
+          <path d="M96 92 L116 115 L104 122 L92 105" fill="#64748b" stroke="#334155" stroke-width="2"/>
+          <!-- Pants -->
+          <rect x="46" y="148" width="20" height="26" fill="#334155"/>
+          <rect x="74" y="148" width="20" height="26" fill="#334155"/>
+        </svg>`,
+      badrBoy: `
+        <svg viewBox="0 0 140 180" width="120" height="155">
+          <!-- Hair -->
+          <path d="M40 52 C35 20, 105 20, 100 52 Z" fill="#4a2c18"/>
+          <!-- Face -->
+          <circle cx="70" cy="58" r="26" fill="#fcd3b4" stroke="#d99b72" stroke-width="2"/>
+          <circle cx="61" cy="55" r="3.5" fill="#1e293b"/>
+          <circle cx="79" cy="55" r="3.5" fill="#1e293b"/>
+          <circle cx="62" cy="54" r="1.2" fill="#fff"/>
+          <circle cx="80" cy="54" r="1.2" fill="#fff"/>
+          <path d="M61 67 Q70 77 79 67" fill="#ef4444" stroke="#9a3412" stroke-width="2"/>
+          <!-- Yellow T-Shirt -->
+          <path d="M44 90 L96 90 L102 145 L38 145 Z" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+          <path d="M44 90 L22 108 L32 118 L46 104" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+          <path d="M96 90 L118 108 L108 118 L94 104" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+          <!-- Jeans -->
+          <rect x="46" y="145" width="20" height="28" fill="#1d4ed8"/>
+          <rect x="74" y="145" width="20" height="28" fill="#1d4ed8"/>
+        </svg>`,
+      tabletBoy: `
+        <svg viewBox="0 0 140 180" width="120" height="155">
+          <!-- Hair -->
+          <path d="M40 52 C35 20, 105 20, 100 52 Z" fill="#4a2c18"/>
+          <!-- Face -->
+          <circle cx="70" cy="58" r="26" fill="#fcd3b4" stroke="#d99b72" stroke-width="2"/>
+          <circle cx="61" cy="55" r="3.5" fill="#1e293b"/>
+          <circle cx="79" cy="55" r="3.5" fill="#1e293b"/>
+          <circle cx="62" cy="54" r="1.2" fill="#fff"/>
+          <circle cx="80" cy="54" r="1.2" fill="#fff"/>
+          <path d="M62 68 Q70 76 78 68" fill="none" stroke="#9a3412" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- White Shirt & Tie -->
+          <path d="M44 90 L96 90 L102 145 L38 145 Z" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+          <polygon points="68,90 72,90 74,115 70,120 66,115" fill="#0ea5e9"/>
+          <!-- Tablet in hand -->
+          <rect x="48" y="106" width="44" height="32" rx="4" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+          <rect x="52" y="110" width="36" height="24" rx="2" fill="#38bdf8"/>
+          <!-- Pants -->
+          <rect x="46" y="145" width="20" height="28" fill="#475569"/>
+          <rect x="74" y="145" width="20" height="28" fill="#475569"/>
+        </svg>`
+    };
+
+    const miniBoyAvatar = `
+      <svg viewBox="0 0 60 60" width="42" height="42">
+        <circle cx="30" cy="30" r="28" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+        <path d="M16 26 C14 10, 46 10, 44 26 Z" fill="#4a2c18"/>
+        <circle cx="30" cy="31" r="13" fill="#fcd3b4"/>
+        <circle cx="25" cy="29" r="2" fill="#1e293b"/>
+        <circle cx="35" cy="29" r="2" fill="#1e293b"/>
+        <path d="M26 36 Q30 40 34 36" fill="none" stroke="#9a3412" stroke-width="2" stroke-linecap="round"/>
+      </svg>`;
+
+    // Item SVGs
+    const itemIcons = {
+      helmet: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <path d="M18 62 C18 32, 82 32, 82 62 Z" fill="#facc15" stroke="#ca8a04" stroke-width="3"/>
+          <rect x="42" y="28" width="16" height="34" rx="4" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+          <path d="M10 62 L90 62 C92 68, 86 72, 78 72 L22 72 C14 72, 8 68, 10 62 Z" fill="#eab308" stroke="#a16207" stroke-width="3"/>
+        </svg>`,
+      smartphone: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="28" y="10" width="44" height="80" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+          <rect x="33" y="19" width="34" height="58" rx="3" fill="#38bdf8"/>
+          <path d="M36 22 L56 22 L42 74 L36 74 Z" fill="#7dd3fc" opacity="0.5"/>
+          <circle cx="50" cy="83" r="3" fill="#94a3b8"/>
+          <rect x="44" y="14" width="12" height="2" rx="1" fill="#64748b"/>
+        </svg>`,
+      headset: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <path d="M24 54 C24 22, 76 22, 76 54" fill="none" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+          <rect x="16" y="46" width="14" height="26" rx="6" fill="#0284c7" stroke="#1e293b" stroke-width="2.5"/>
+          <rect x="70" y="46" width="14" height="26" rx="6" fill="#0284c7" stroke="#1e293b" stroke-width="2.5"/>
+          <path d="M76 70 Q72 84 52 84" fill="none" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="50" cy="84" r="4" fill="#38bdf8" stroke="#1e293b" stroke-width="2"/>
+        </svg>`,
+      doctorBag: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <!-- Handle -->
+          <path d="M36 32 L36 22 C36 18, 64 18, 64 22 L64 32" fill="none" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+          <!-- Bag Body -->
+          <rect x="16" y="32" width="68" height="50" rx="10" fill="#ef4444" stroke="#991b1b" stroke-width="3"/>
+          <!-- White Medical Cross Badge -->
+          <circle cx="50" cy="57" r="16" fill="#ffffff"/>
+          <rect x="46" y="47" width="8" height="20" rx="2" fill="#dc2626"/>
+          <rect x="40" y="53" width="20" height="8" rx="2" fill="#dc2626"/>
+          <!-- Latches -->
+          <rect x="28" y="29" width="6" height="8" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+          <rect x="66" y="29" width="6" height="8" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+        </svg>`,
+      microscope: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="22" y="80" width="56" height="10" rx="4" fill="#0284c7" stroke="#1e293b" stroke-width="2.5"/>
+          <path d="M62 80 C76 68, 76 42, 56 34" fill="none" stroke="#38bdf8" stroke-width="9" stroke-linecap="round"/>
+          <rect x="36" y="20" width="14" height="36" rx="3" transform="rotate(-25 43 38)" fill="#e2e8f0" stroke="#1e293b" stroke-width="2.5"/>
+          <rect x="28" y="62" width="34" height="5" rx="2" fill="#334155"/>
+        </svg>`,
+      mouse: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <path d="M50 18 C50 6, 72 6, 68 22" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+          <rect x="30" y="22" width="40" height="64" rx="20" fill="#f8fafc" stroke="#475569" stroke-width="3"/>
+          <line x1="30" y1="46" x2="70" y2="46" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="50" y1="22" x2="50" y2="46" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="47" y="29" width="6" height="11" rx="3" fill="#38bdf8"/>
+        </svg>`,
+      smartwatch: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="38" y="8" width="24" height="84" rx="5" fill="#334155" stroke="#0f172a" stroke-width="2.5"/>
+          <rect x="28" y="26" width="44" height="48" rx="10" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>
+          <rect x="33" y="31" width="34" height="38" rx="6" fill="#0f172a"/>
+          <text x="50" y="54" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="bold">10:30</text>
+        </svg>`,
+      printer: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="28" y="14" width="44" height="22" fill="#f8fafc" stroke="#475569" stroke-width="2.5"/>
+          <rect x="14" y="34" width="72" height="36" rx="8" fill="#cbd5e1" stroke="#334155" stroke-width="3"/>
+          <rect x="24" y="54" width="52" height="32" fill="#ffffff" stroke="#475569" stroke-width="2.5"/>
+          <line x1="32" y1="64" x2="68" y2="64" stroke="#38bdf8" stroke-width="3"/>
+          <line x1="32" y1="73" x2="60" y2="73" stroke="#94a3b8" stroke-width="3"/>
+          <circle cx="74" cy="43" r="3.5" fill="#22c55e"/>
+        </svg>`,
+      usb: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <g transform="rotate(-35 50 50)">
+            <rect x="16" y="36" width="48" height="28" rx="5" fill="#e2e8f0" stroke="#475569" stroke-width="3"/>
+            <rect x="64" y="41" width="22" height="18" rx="2" fill="#94a3b8" stroke="#334155" stroke-width="2.5"/>
+            <rect x="70" y="45" width="5" height="3" fill="#1e293b"/>
+            <rect x="70" y="52" width="5" height="3" fill="#1e293b"/>
+          </g>
+        </svg>`,
+      noPhoneSign: `
+        <svg viewBox="0 0 140 140" width="130" height="130">
+          <!-- Phone -->
+          <rect x="48" y="25" width="44" height="90" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+          <rect x="53" y="35" width="34" height="66" rx="3" fill="#64748b"/>
+          <circle cx="70" cy="108" r="3" fill="#cbd5e1"/>
+          <!-- Red Prohibition Circle -->
+          <circle cx="70" cy="70" r="56" fill="none" stroke="#dc2626" stroke-width="11"/>
+          <line x1="31" y1="31" x2="109" y2="109" stroke="#dc2626" stroke-width="11" stroke-linecap="round"/>
+        </svg>`,
+      keyboard: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="10" y="30" width="80" height="44" rx="7" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+          <rect x="17" y="37" width="10" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="31" y="37" width="10" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="45" y="37" width="10" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="59" y="37" width="10" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="73" y="37" width="10" height="8" rx="2" fill="#38bdf8"/>
+          <rect x="17" y="49" width="12" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="33" y="49" width="12" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="49" y="49" width="12" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="65" y="49" width="18" height="8" rx="2" fill="#e2e8f0"/>
+          <rect x="28" y="61" width="44" height="7" rx="2" fill="#cbd5e1"/>
+        </svg>`,
+      monitor: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="14" y="18" width="72" height="50" rx="6" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+          <rect x="20" y="24" width="60" height="38" rx="2" fill="#38bdf8"/>
+          <circle cx="50" cy="43" r="10" fill="#fde047"/>
+          <rect x="42" y="68" width="16" height="12" fill="#64748b"/>
+          <rect x="30" y="80" width="40" height="6" rx="3" fill="#334155"/>
+        </svg>`,
+      speakers: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="28" y="16" width="44" height="68" rx="8" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+          <circle cx="50" cy="34" r="9" fill="#64748b" stroke="#94a3b8" stroke-width="2"/>
+          <circle cx="50" cy="62" r="15" fill="#1e293b" stroke="#38bdf8" stroke-width="3"/>
+          <circle cx="50" cy="62" r="5" fill="#38bdf8"/>
+        </svg>`,
+      camera: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="16" y="30" width="68" height="46" rx="9" fill="#475569" stroke="#1e293b" stroke-width="3"/>
+          <rect x="36" y="21" width="28" height="10" rx="3" fill="#334155"/>
+          <circle cx="50" cy="53" r="16" fill="#0f172a" stroke="#cbd5e1" stroke-width="3"/>
+          <circle cx="50" cy="53" r="8" fill="#38bdf8"/>
+          <circle cx="73" cy="39" r="3.5" fill="#fde047"/>
+        </svg>`,
+      envelope: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="14" y="26" width="72" height="48" rx="7" fill="#fef08a" stroke="#eab308" stroke-width="3"/>
+          <path d="M16 28 L50 54 L84 28" fill="none" stroke="#ca8a04" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="76" cy="28" r="11" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+          <text x="76" y="32" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">1</text>
+        </svg>`,
+      laptop: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <rect x="20" y="22" width="60" height="42" rx="5" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+          <rect x="25" y="27" width="50" height="32" rx="2" fill="#38bdf8"/>
+          <path d="M10 64 L90 64 L84 74 L16 74 Z" fill="#94a3b8" stroke="#475569" stroke-width="2.5"/>
+        </svg>`,
+      book: `
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <path d="M18 24 C32 20, 46 24, 50 30 C54 24, 68 20, 82 24 L82 74 C68 70, 54 74, 50 80 C46 74, 32 70, 18 74 Z" fill="#f8fafc" stroke="#0284c7" stroke-width="3.5"/>
+          <line x1="50" y1="30" x2="50" y2="80" stroke="#0284c7" stroke-width="3"/>
+          <line x1="25" y1="38" x2="43" y2="40" stroke="#94a3b8" stroke-width="2.5"/>
+          <line x1="25" y1="48" x2="43" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+          <line x1="57" y1="40" x2="75" y2="38" stroke="#94a3b8" stroke-width="2.5"/>
+          <line x1="57" y1="50" x2="75" y2="48" stroke="#94a3b8" stroke-width="2.5"/>
+        </svg>`,
+      wifiSign: `
+        <svg viewBox="0 0 140 140" width="130" height="130">
+          <circle cx="70" cy="70" r="58" fill="#eff6ff" stroke="#0284c7" stroke-width="6"/>
+          <path d="M32 58 Q70 26 108 58" fill="none" stroke="#0284c7" stroke-width="8" stroke-linecap="round"/>
+          <path d="M45 73 Q70 50 95 73" fill="none" stroke="#0ea5e9" stroke-width="8" stroke-linecap="round"/>
+          <path d="M58 88 Q70 76 82 88" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="70" cy="102" r="7" fill="#0284c7"/>
+        </svg>`
+    };
+
+    // Quiz Data (6 Slides)
+    const slides = [
+      {
+        type: 'cards',
+        title: 'مسابقة أبطال الاتصالات',
+        subtitle: '',
+        question: 'أيُّ جِهازٍ يُساعِدُنا على التَّحَدُّثِ مع جَدِّنا؟',
+        character: boyCharacters.suitBoy,
+        speakerName: '', // Removed "نورة" as requested!
+        options: [
+          { num: '1', letter: 'أ', label: 'خوذة أمان', icon: itemIcons.helmet, color: '#ec4899', correct: false },
+          { num: '2', letter: 'ب', label: 'هاتف ذكي', icon: itemIcons.smartphone, color: '#0ea5e9', correct: true },
+          { num: '3', letter: 'ج', label: 'حقيبة طبيب', icon: itemIcons.doctorBag, color: '#22c55e', correct: false },
+          { num: '4', letter: 'د', label: 'مجهر', icon: itemIcons.microscope, color: '#f97316', correct: false }
+        ],
+        successMsg: 'رائع! الهاتف الذكي هو وسيلة الاتصال التي تساعدنا على التحدث مع جدنا.',
+        errorMsg: 'حاول مرة أخرى! ابحث عن الجهاز الذي نستخدمه لإجراء المكالمات الهاتفية.'
+      },
+      {
+        type: 'cards',
+        title: 'ما هو الشيء المرتبط بالحاسوب؟',
+        subtitle: 'اختر الوحدة المناسبة لأداء المهمة',
+        question: 'أيُّ قِطعةٍ تُساعِدُنا على طِباعةِ الواجِب؟',
+        character: boyCharacters.badrBoy,
+        speakerName: 'بدر',
+        options: [
+          { num: '1', letter: 'أ', label: 'فأرة', icon: itemIcons.mouse, color: '#ec4899', correct: false },
+          { num: '2', letter: 'ب', label: 'ساعة ذكية', icon: itemIcons.smartwatch, color: '#22c55e', correct: false },
+          { num: '3', letter: 'ج', label: 'طابعة', icon: itemIcons.printer, color: '#a855f7', correct: true },
+          { num: '4', letter: 'د', label: 'ذاكرة فلاش', icon: itemIcons.usb, color: '#f97316', correct: false }
+        ],
+        successMsg: 'أحسنت يا بطل! الطابعة هي التي تطبع الواجب المدرسي على الورق.',
+        errorMsg: 'إجابة غير صحيحة! فكر في الجهاز الذي يخرج لنا الأوراق المطبوعة.'
+      },
+      {
+        type: 'sign',
+        title: 'ماذا تعني هذه الإشارة؟',
+        subtitle: 'تعرّف على قواعد السلوك الصحيح',
+        question: 'ما هي القَواعدُ عندَ زِيارةِ المُستَشفى؟',
+        character: boyCharacters.tabletBoy,
+        speakerName: 'طالب',
+        signIcon: itemIcons.noPhoneSign,
+        options: [
+          { letter: 'أ', text: 'اللَّعِبُ بالهاتِفِ', color: '#ec4899', correct: false },
+          { letter: 'ب', text: 'التِقاطُ صُوَرٍ', color: '#a855f7', correct: false },
+          { letter: 'ج', text: 'لا تَستَخدِمِ الهاتِفَ', color: '#22c55e', correct: true },
+          { letter: 'د', text: 'إرسالُ بَريدٍ إلكترونيٍّ', color: '#f43f5e', correct: false }
+        ],
+        successMsg: 'ممتاز! العلامة الحمراء تعني ممنوع استخدام الهاتف داخل المستشفى.',
+        errorMsg: 'انتبه للخط الأحمر فوق الهاتف! ماذا يعني وجود دائرة حمراء مشطوبة؟'
+      },
+      {
+        type: 'cards',
+        title: 'وحدات الإدخال في الحاسوب',
+        subtitle: 'اختر الجهاز المناسب للكتابة',
+        question: 'أيُّ جِهازٍ نَستَخدِمُهُ لِكِتابةِ الحُروفِ والأرقامِ على الحاسوب؟',
+        character: boyCharacters.suitBoy,
+        speakerName: 'سعد',
+        options: [
+          { num: '1', letter: 'أ', label: 'لوحة المفاتيح', icon: itemIcons.keyboard, color: '#0ea5e9', correct: true },
+          { num: '2', letter: 'ب', label: 'مكبرات الصوت', icon: itemIcons.speakers, color: '#ec4899', correct: false },
+          { num: '3', letter: 'ج', label: 'شاشة العرض', icon: itemIcons.monitor, color: '#22c55e', correct: false },
+          { num: '4', letter: 'د', label: 'طابعة', icon: itemIcons.printer, color: '#f97316', correct: false }
+        ],
+        successMsg: 'عبقري! لوحة المفاتيح تحتوي على أزرار الحروف والأرقام للكتابة.',
+        errorMsg: 'حاول مجدداً! أي جهاز يحتوي على أزرار كثيرة نضغط عليها لنكتب؟'
+      },
+      {
+        type: 'cards',
+        title: 'أبطال الاتصالات الحديثة',
+        subtitle: 'اختر الوسيلة الصحيحة للتواصل الكتابي',
+        question: 'ما الرَّمزُ الذي يَدُلُّ على الرَّسائِلِ الإلكترونيةِ؟',
+        character: boyCharacters.badrBoy,
+        speakerName: 'بدر',
+        options: [
+          { num: '1', letter: 'أ', label: 'كاميرا تصوير', icon: itemIcons.camera, color: '#a855f7', correct: false },
+          { num: '2', letter: 'ب', label: 'كتاب مدرسي', icon: itemIcons.book, color: '#f97316', correct: false },
+          { num: '3', letter: 'ج', label: 'رسالة بريد', icon: itemIcons.envelope, color: '#22c55e', correct: true },
+          { num: '4', letter: 'د', label: 'فأرة حاسوب', icon: itemIcons.mouse, color: '#ec4899', correct: false }
+        ],
+        successMsg: 'إجابة صحيحة! رمز الظرف يدل على الرسائل النصية والبريد الإلكتروني.',
+        errorMsg: 'فكر قليلاً! أي صورة تشبه الظرف الذي نضع فيه الرسائل؟'
+      },
+      {
+        type: 'sign',
+        title: 'رموز التقنية والإنترنت',
+        subtitle: 'اكتشف معنى الرمز التقني',
+        question: 'على ماذا يَدُلُّ هذا الرَّمزُ في أجهِزَتِنا الذَّكيَّةِ؟',
+        character: boyCharacters.tabletBoy,
+        speakerName: 'فهد',
+        signIcon: itemIcons.wifiSign,
+        options: [
+          { letter: 'أ', text: 'إغلاقُ جِهازِ الحاسوبِ', color: '#ec4899', correct: false },
+          { letter: 'ب', text: 'الاتِّصالُ بِشَبَكَةِ الإنترنت (Wi-Fi)', color: '#0ea5e9', correct: true },
+          { letter: 'ج', text: 'رَفعُ صَوتِ السَّمّاعاتِ', color: '#a855f7', correct: false },
+          { letter: 'د', text: 'طِباعةُ المُستَنَداتِ', color: '#f97316', correct: false }
+        ],
+        successMsg: 'رائع جداً يا بطل! هذا هو رمز شبكة الواي فاي للاتصال بالإنترنت.',
+        errorMsg: 'حاول مرة أخرى! هذه الأقواس الزرقاء تظهر عندما نتصل بالشبكة اللاسلكية.'
+      }
+    ];
+
+    let currentSlideIndex = 0;
+    let score = 0;
+    let answeredCurrent = false;
+    let firstTry = true;
+
+    const slideTitleEl = document.getElementById('slide-title');
+    const slideSubtitleEl = document.getElementById('slide-subtitle');
+    const questionTextEl = document.getElementById('question-text');
+    const characterContainer = document.getElementById('character-container');
+    const speakerTagEl = document.getElementById('speaker-tag');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackBox = document.getElementById('feedback-box');
+    const nextBtn = document.getElementById('next-btn');
+    const progressFill = document.getElementById('progress-fill');
+    const scoreDisplay = document.getElementById('score-display');
+    const stageIndicator = document.getElementById('stage-indicator');
+    const quizStage = document.getElementById('quiz-stage');
+    const endScreen = document.getElementById('end-screen');
+
+    function renderSlide(index) {
+      const slide = slides[index];
+      answeredCurrent = false;
+      firstTry = true;
+      nextBtn.disabled = true;
+
+      feedbackBox.className = 'feedback-box';
+      feedbackBox.textContent = '';
+
+      slideTitleEl.textContent = slide.title;
+      slideSubtitleEl.textContent = slide.subtitle;
+      slideSubtitleEl.style.display = slide.subtitle ? 'block' : 'none';
+      questionTextEl.textContent = slide.question;
+      characterContainer.innerHTML = slide.character;
+
+      // Speaker tag (No Noura name on slide 1!)
+      if (slide.speakerName) {
+        speakerTagEl.innerHTML = `${miniBoyAvatar}<span>${slide.speakerName}</span>`;
+      } else {
+        speakerTagEl.innerHTML = `${miniBoyAvatar}`;
+      }
+
+      stageIndicator.textContent = `المرحلة ${index + 1} من ${slides.length}`;
+      progressFill.style.width = `${((index + 1) / slides.length) * 100}%`;
+
+      if (slide.type === 'cards') {
+        const grid = document.createElement('div');
+        grid.className = 'options-grid-cards';
+
+        slide.options.forEach((opt) => {
+          const card = document.createElement('div');
+          card.className = 'card-option';
+          card.style.setProperty('--card-color', opt.color);
+          card.innerHTML = `
+            <div class="card-num">${opt.num}</div>
+            <div class="card-art">${opt.icon}</div>
+            <div class="card-label">${opt.label}</div>
+            <div class="card-letter">${opt.letter}</div>
+          `;
+          card.addEventListener('click', () => handleAnswer(card, opt.correct, slide));
+          grid.appendChild(card);
+        });
+
+        optionsContainer.innerHTML = '';
+        optionsContainer.appendChild(grid);
+      } else {
+        const layout = document.createElement('div');
+        layout.className = 'slide3-layout';
+
+        const signBox = document.createElement('div');
+        signBox.className = 'sign-showcase';
+        signBox.innerHTML = `
+          ${slide.signIcon}
+          <div style="color:#0f172a; font-weight:800; font-size:1.1rem; margin-top:8px;">إشارة إرشادية</div>
+        `;
+
+        const list = document.createElement('div');
+        list.className = 'text-options-list';
+
+        slide.options.forEach((opt) => {
+          const item = document.createElement('div');
+          item.className = 'text-option';
+          item.style.setProperty('--card-color', opt.color);
+          item.innerHTML = `
+            <div class="text-option-badge">${opt.letter}</div>
+            <div class="text-option-content">${opt.text}</div>
+          `;
+          item.addEventListener('click', () => handleAnswer(item, opt.correct, slide));
+          list.appendChild(item);
+        });
+
+        layout.appendChild(signBox);
+        layout.appendChild(list);
+        optionsContainer.innerHTML = '';
+        optionsContainer.appendChild(layout);
+      }
+    }
+
+    function handleAnswer(element, isCorrect, slide) {
+      if (answeredCurrent) return;
+
+      if (isCorrect) {
+        answeredCurrent = true;
+        element.classList.add('correct-choice');
+        playCorrectSound();
+
+        if (firstTry) {
+          score++;
+          scoreDisplay.textContent = `${score} / ${slides.length}`;
+        }
+
+        // Disable all options
+        document.querySelectorAll('.card-option, .text-option').forEach(el => el.classList.add('disabled'));
+
+        feedbackBox.textContent = `✅ ${slide.successMsg}`;
+        feedbackBox.className = 'feedback-box show success';
+        nextBtn.disabled = false;
+
+        // Spin star
+        const star = document.getElementById('progress-star');
+        star.style.transform = 'scale(1.3) rotate(360deg)';
+        setTimeout(() => star.style.transform = 'scale(1) rotate(0deg)', 500);
+      } else {
+        firstTry = false;
+        element.classList.add('wrong-choice', 'disabled');
+        playWrongSound();
+        feedbackBox.textContent = `❌ ${slide.errorMsg}`;
+        feedbackBox.className = 'feedback-box show error';
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentSlideIndex < slides.length - 1) {
+        currentSlideIndex++;
+        renderSlide(currentSlideIndex);
+      } else {
+        showEndScreen();
+      }
+    });
+
+    function showEndScreen() {
+      quizStage.style.display = 'none';
+      endScreen.classList.add('active');
+      playWinSound();
+      launchConfetti();
+
+      document.getElementById('final-score-text').textContent = `النتيجة النهائية: ${score} من ${slides.length}`;
+      const starsStr = score >= 5 ? '⭐⭐⭐' : score >= 3 ? '⭐⭐' : '⭐';
+      document.getElementById('stars-earned').textContent = starsStr;
+    }
+
+    document.getElementById('restart-btn').addEventListener('click', () => {
+      currentSlideIndex = 0;
+      score = 0;
+      scoreDisplay.textContent = `0 / ${slides.length}`;
+      endScreen.classList.remove('active');
+      quizStage.style.display = 'block';
+      renderSlide(0);
+    });
+
+    document.getElementById('sound-toggle').addEventListener('click', (e) => {
+      soundEnabled = !soundEnabled;
+      e.currentTarget.textContent = soundEnabled ? '🔊' : '🔇';
+    });
+
+    // Simple Confetti Effect
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = Array.from({ length: 90 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        w: 10 + Math.random() * 8,
+        h: 6 + Math.random() * 6,
+        color: ['#fde047', '#38bdf8', '#22c55e', '#ec4899', '#f97316'][Math.floor(Math.random() * 5)],
+        speed: 3 + Math.random() * 4,
+        angle: Math.random() * 360
+      }));
+
+      let frames = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.y += p.speed;
+          p.angle += 4;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        frames++;
+        if (frames < 160) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    }
+
+    // Start Game
+    renderSlide(0);
+  </script>
+</body>
+</html>
